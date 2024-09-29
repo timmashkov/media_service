@@ -3,6 +3,7 @@ from redis.asyncio import Redis
 from application.config import settings
 from infrastructure.base_entities.singleton import OnlyContainer, Singleton
 from infrastructure.database.alchemy_gateway import SessionManager
+from infrastructure.file_manager.minio_client import MinioClient
 
 
 class Container(Singleton):
@@ -22,4 +23,16 @@ class Container(Singleton):
         port=settings.POSTGRES.port,
         database=settings.POSTGRES.database,
         echo=settings.POSTGRES.echo,
+    )
+
+    file_hosting_client = OnlyContainer(
+        MinioClient,
+        protocol=settings.S3.protocol,
+        host=settings.S3.host,
+        port=settings.S3.port,
+        access_key=settings.S3.access_key,
+        secret_key=settings.S3.secret_key,
+        region=settings.S3.region,
+        chunk_size=settings.S3.chunk_size,
+        loop=None,
     )

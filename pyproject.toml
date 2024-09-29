@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "media-service"
-version = "0.0.1"
+version = "0.0.2"
 description = ""
 authors = ["timmashkov <bodomizer@yandex.ru>"]
 readme = "README.md"
@@ -16,6 +16,8 @@ isort = "^5.13.2"
 SQLAlchemy = "^2.0.35"
 dynaconf = "^3.2.6"
 redis = "^5.1.0"
+alembic = "^1.13.3"
+asyncpg = "^0.29.0"
 
 
 [build-system]
