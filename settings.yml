@@ -25,3 +25,21 @@ default:
     username:
     password:
     db: 0
+  KAFKA:
+    routing_key: routing_key
+    host: localhost
+    port: 9092
+    topics:
+      - service_name.topic
+  S3:
+    protocol: http
+    host: localhost
+    port: 9000
+    access_key:
+    secret_key:
+    region:
+    chunk_size:
+  S3_ERRORS:
+    NO_SUCH_BUCKET: NoSuchBucket
+    NO_SUCH_FILE: NoSuchKey
+    MINIO_STORAGE_FULL: XMinioStorageFull

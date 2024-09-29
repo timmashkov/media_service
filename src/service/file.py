@@ -29,8 +29,10 @@ class FileService:
         await self.file_manager.upload_file(
             bucket_name=file.bucket,
             object_name=file.path,
+            mimetype=file.mimetype,
             data=file_data,
             tags=file.tags,
+            content_type=file.mimetype,
         )
         return await self.write_repo.create(cmd=file)
 

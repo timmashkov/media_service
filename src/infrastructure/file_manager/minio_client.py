@@ -1,7 +1,8 @@
 import logging
 import os
 from asyncio import AbstractEventLoop, get_event_loop
-from typing import AsyncGenerator, Iterator, Protocol, Union
+from datetime import datetime
+from typing import AsyncGenerator, Iterator, Optional, Protocol, Union
 
 import certifi
 from minio import Minio, S3Error
@@ -59,9 +60,16 @@ class MinioClient:
         )
 
     async def upload_file(
-        self, bucket_name: str, object_name: str, data: FileReaderProtocol, **kwargs
+        self,
+        bucket_name: str,
+        object_name: str,
+        mimetype: str,
+        data: FileReaderProtocol,
+        **kwargs,
     ) -> str:
-        self.logger.debug("Загрузка файла %s в bucket %s...", object_name, bucket_name)
+        self.logger.warning(
+            "Загрузка файла %s в bucket %s...", object_name, bucket_name
+        )
         length = kwargs.pop("length", -1)
         kwargs["part_size"] = MIN_PART_SIZE if length == -1 else 0
         minio_tags = Tags(for_object=True)
@@ -71,7 +79,7 @@ class MinioClient:
                 loop=self.loop,
                 func=self.client.put_object,
                 bucket_name=bucket_name,
-                object_name=object_name,
+                object_name=self.format_masks(object_name, mimetype),
                 data=data,
                 length=length,
                 tags=minio_tags,
@@ -85,13 +93,15 @@ class MinioClient:
                     func=self.client.make_bucket,
                     bucket_name=bucket_name,
                 )
-                self.logger.info("Bucket %s успешно создан", bucket_name)
-                return await self.upload_file(bucket_name, object_name, data, **kwargs)
+                self.logger.warning("Bucket %s успешно создан", bucket_name)
+                return await self.upload_file(
+                    bucket_name, object_name, mimetype, data, **kwargs
+                )
             if error.code == settings.S3_ERRORS.MINIO_STORAGE_FULL:
                 self.logger.error("Закончилось место на диске")
                 raise OutDiskSpace("Закончилось место на диске")
             raise error
-        self.logger.debug(
+        self.logger.warning(
             "Загрузка файла %s в bucket %s прошла успешно", object_name, bucket_name
         )
         return response.object_name
@@ -183,3 +193,18 @@ class MinioClient:
                 return False
             raise error
         return True
+
+    @classmethod
+    def format_masks(
+        cls, text: str, extension: str, date: Optional[datetime] = None
+    ) -> str:
+        type_ext = "." + extension.split("/")[-1]
+        date = date or datetime.now()
+        dates = {
+            "DD": date.strftime("%d").zfill(2),
+            "MM": date.strftime("%m").zfill(2),
+            "YY": date.strftime("%y").zfill(2),
+            "YYYY": date.strftime("%Y"),
+            "MONTH": date.strftime("%B"),
+        }
+        return text.format(**dates) + type_ext
