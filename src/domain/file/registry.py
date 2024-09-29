@@ -16,7 +16,7 @@ from infrastructure.database.models import File
 from infrastructure.exceptions.minio_exceptions import FileAlreadyExist
 
 
-class ProfileReadRegistry(AbstractReadRepository):
+class FileReadRegistry(AbstractReadRepository):
     def __init__(self, session_manager: SessionManager):
         super().__init__()
         self.model = File
@@ -27,9 +27,9 @@ class ProfileReadRegistry(AbstractReadRepository):
             session_manager.async_session_factory
         )
 
-    async def get(self, prof_uuid: UUID) -> Optional[File]:
+    async def get(self, file_uuid: UUID) -> Optional[File]:
         async with self.transactional_session() as session:
-            stmt = select(self.model).filter(self.model.uuid == prof_uuid)
+            stmt = select(self.model).filter(self.model.uuid == file_uuid)
             result = await session.execute(stmt)
             answer = result.scalar_one_or_none()
         return answer
@@ -47,7 +47,7 @@ class ProfileReadRegistry(AbstractReadRepository):
         return final
 
 
-class ProfileWriteRegistry(AbstractWriteRepository):
+class FileWriteRegistry(AbstractWriteRepository):
     def __init__(self, session_manager: SessionManager):
         super().__init__()
         self.model = File
@@ -74,13 +74,13 @@ class ProfileWriteRegistry(AbstractWriteRepository):
     async def update(
         self,
         cmd: CreateFile,
-        prof_uuid: UUID,
+        file_uuid: UUID,
     ) -> Optional[File]:
         async with self.transactional_session() as session:
             stmt = (
                 update(self.model)
                 .values(**cmd.model_dump())
-                .where(self.model.uuid == prof_uuid)
+                .where(self.model.uuid == file_uuid)
                 .returning(self.model)
             )
             result = await session.execute(stmt)
@@ -88,11 +88,11 @@ class ProfileWriteRegistry(AbstractWriteRepository):
             answer = result.scalar_one_or_none()
         return answer
 
-    async def delete(self, prof_uuid: UUID) -> Optional[File]:
+    async def delete(self, file_uuid: UUID) -> Optional[File]:
         async with self.transactional_session() as session:
             stmt = (
                 delete(self.model)
-                .where(self.model.uuid == prof_uuid)
+                .where(self.model.uuid == file_uuid)
                 .returning(self.model)
             )
             result = await session.execute(stmt)

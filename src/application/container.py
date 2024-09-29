@@ -1,6 +1,7 @@
 from redis.asyncio import Redis
 
 from application.config import settings
+from domain.file.registry import FileReadRegistry, FileWriteRegistry
 from infrastructure.base_entities.singleton import OnlyContainer, Singleton
 from infrastructure.database.alchemy_gateway import SessionManager
 from infrastructure.file_manager.minio_client import MinioClient
@@ -35,4 +36,14 @@ class Container(Singleton):
         region=settings.S3.region,
         chunk_size=settings.S3.chunk_size,
         loop=None,
+    )
+
+    file_read_registry = OnlyContainer(
+        FileReadRegistry,
+        session_manager=alchemy_manager(),
+    )
+
+    file_write_registry = OnlyContainer(
+        FileWriteRegistry,
+        session_manager=alchemy_manager(),
     )

@@ -17,7 +17,9 @@ class CreateFile(BaseModel):
     tags: Optional[dict] = Field(default=None, description=File.tags.comment)
     jdata: Optional[dict] = Field(default=None, description=File.jdata.comment)
     references: Optional[str] = Field(default=None, description=File.references.comment)
-    reference_uuid: Optional[UUID] = Field(default=None, description=File.reference_uuid.comment)
+    reference_uuid: Optional[UUID] = Field(
+        default=None, description=File.reference_uuid.comment
+    )
     bucket: str = Field(description=File.bucket.comment)
     mimetype: str = Field(description=File.mimetype.comment)
 

@@ -1,7 +1,7 @@
 import logging
 import os
 from asyncio import AbstractEventLoop, get_event_loop
-from typing import AsyncGenerator, Iterator, Union
+from typing import AsyncGenerator, Iterator, Protocol, Union
 
 import certifi
 from minio import Minio, S3Error
@@ -12,6 +12,11 @@ from urllib3 import HTTPResponse, PoolManager, Retry, Timeout
 from application.config import settings
 from infrastructure.exceptions.minio_exceptions import OutDiskSpace
 from infrastructure.handlers.asyncio_handler import run_in_executor
+
+
+class FileReaderProtocol(Protocol):
+    def read(self) -> bytes:
+        pass
 
 
 class MinioClient:
@@ -54,7 +59,7 @@ class MinioClient:
         )
 
     async def upload_file(
-        self, bucket_name: str, object_name: str, data: bytes, **kwargs
+        self, bucket_name: str, object_name: str, data: FileReaderProtocol, **kwargs
     ) -> str:
         self.logger.debug("Загрузка файла %s в bucket %s...", object_name, bucket_name)
         length = kwargs.pop("length", -1)
