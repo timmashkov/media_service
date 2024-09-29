@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "media-service"
+version = "0.0.1"
+description = ""
+authors = ["timmashkov <bodomizer@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+minio = "^7.2.9"
+uvicorn = "^0.31.0"
+black = "^24.8.0"
+flake8 = "^7.1.1"
+isort = "^5.13.2"
+SQLAlchemy = "^2.0.35"
+dynaconf = "^3.2.6"
+redis = "^5.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
